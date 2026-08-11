@@ -1,4 +1,7 @@
+create or alter procedure silver.load_silver as
+begin
 -- clean and standardize data from table bronze.crm_cust_info and insert into table silver.crm_cust_info
+truncate table silver.crm_cust_info;
 insert into silver.crm_cust_info(
 	cst_id, 
 	cst_key, 
@@ -31,6 +34,7 @@ where cst_id is not null
 ) t where flag_last = 1
 
 -- clean and standardize data from table bronze.crm_prd_info and insert into table silver.crm_prd_info
+truncate table silver.crm_prd_info;
 insert into silver.crm_prd_info(
 	prd_id, 
 	cat_id,
@@ -58,6 +62,7 @@ cast(lead(prd_start_dt) over (partition by prd_key order by prd_start_dt) - 1 as
 from bronze.crm_prd_info 
 
 -- clean and standardize data from table bronze.crm_sales_details and insert into table silver.crm_sales_details
+truncate table silver.crm_sales_details
 insert into silver.crm_sales_details(
 	sls_ord_num, 
 	sls_prd_key, 
@@ -94,6 +99,7 @@ case when sls_price is null or sls_price <= 0
 from bronze.crm_sales_details
 
 -- clean and standardize data from table bronze.erp_cust_az12 and insert into table silver.erp_cust_az12
+truncate table silver.erp_cust_az12
 insert into silver.erp_cust_az12 (cid, bdate, gen)
 select 
 case when cid like 'NAS%' then substring(cid, 4, len(cid))
@@ -109,6 +115,7 @@ case when upper(trim(gen)) in  ('F', 'FEMALE') THEN 'Female'
 from bronze.erp_cust_az12
 
 -- clean and standardize data from table bronze.erp_loc_a101 and insert into table silver.erp_loc_a101
+truncate table silver.erp_loc_a101
 insert into silver.erp_loc_a101 (cid, cntry)
 select 
 replace(cid, '-', ''), 
@@ -120,6 +127,7 @@ end as cntry
 from bronze.erp_loc_a101
 
 -- clean and standardize data from table bronze.erp_px_cat_g1v2 and insert into table silver.erp_px_cat_g1v2
+truncate table silver.erp_px_cat_g1v2
 insert into silver.erp_px_cat_g1v2(id, cat, subcat, maintenance)
 select 
 id, 
@@ -127,6 +135,7 @@ cat,
 subcat, 
 maintenance
 from bronze.erp_px_cat_g1v2
+end
 
 
 
